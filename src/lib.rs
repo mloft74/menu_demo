@@ -7,7 +7,8 @@ impl Plugin for MenuDemoGame {
         app.add_plugins(DefaultPlugins)
             .add_state::<GameState>()
             .add_system(setup_camera.on_startup())
-            .add_system(setup_button.in_schedule(OnEnter(GameState::MainMenu)))
+            .add_system(setup_main_menu.in_schedule(OnEnter(GameState::MainMenu)))
+            .add_system(cleanup_main_menu.in_schedule(OnExit(GameState::MainMenu)))
             .add_system(button_system);
     }
 }
@@ -23,22 +24,28 @@ fn setup_camera(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 }
 
+#[derive(Component)]
+struct MainMenu;
+
 const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.35, 0.35);
 
-fn setup_button(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup_main_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
-        .spawn(NodeBundle {
-            background_color: Color::GRAY.into(),
-            style: Style {
-                size: Size::width(Val::Percent(100.0)),
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
+        .spawn((
+            MainMenu,
+            NodeBundle {
+                background_color: Color::GRAY.into(),
+                style: Style {
+                    size: Size::width(Val::Percent(100.0)),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
+                    ..default()
+                },
                 ..default()
             },
-            ..default()
-        })
+        ))
         .with_children(|parent| {
             parent
                 .spawn(ButtonBundle {
@@ -65,6 +72,12 @@ fn setup_button(mut commands: Commands, asset_server: Res<AssetServer>) {
                     });
                 });
         });
+}
+
+fn cleanup_main_menu(mut commands: Commands, query: Query<Entity, With<MainMenu>>) {
+    for entity in &query {
+        commands.entity(entity).despawn_recursive();
+    }
 }
 
 fn button_system(
