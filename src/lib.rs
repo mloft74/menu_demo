@@ -1,16 +1,22 @@
 use bevy::prelude::*;
 
-// https://github.com/bevyengine/bevy/blob/v0.10.0/examples/ui/button.rs
-
 pub struct MenuDemoGame;
 
 impl Plugin for MenuDemoGame {
     fn build(&self, app: &mut App) {
         app.add_plugins(DefaultPlugins)
-            .add_startup_system(setup_camera)
-            .add_startup_system(setup_button)
+            .add_state::<GameState>()
+            .add_system(setup_camera.on_startup())
+            .add_system(setup_button.in_schedule(OnEnter(GameState::MainMenu)))
             .add_system(button_system);
     }
+}
+
+#[derive(States, Default, Debug, Hash, Eq, PartialEq, Clone)]
+enum GameState {
+    #[default]
+    MainMenu,
+    SecondMenu,
 }
 
 fn setup_camera(mut commands: Commands) {
@@ -19,38 +25,7 @@ fn setup_camera(mut commands: Commands) {
 
 const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
-const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
-
-type ButtonInteractionQuery<'a, 'b, 'c> = Query<
-    'a,
-    'b,
-    (&'c Interaction, &'c mut BackgroundColor, &'c Children),
-    (Changed<Interaction>, With<Button>),
->;
-
-fn button_system(
-    mut button_interaction_query: ButtonInteractionQuery,
-    mut text_query: Query<&mut Text>,
-) {
-    for (interaction, mut color, children) in &mut button_interaction_query {
-        let mut text = text_query.get_mut(children[0]).unwrap();
-        let section = &mut text.sections[0];
-        match interaction {
-            Interaction::Clicked => {
-                section.value = "Press".to_string();
-                *color = PRESSED_BUTTON.into();
-            }
-            Interaction::Hovered => {
-                section.value = "Hover".to_string();
-                *color = HOVERED_BUTTON.into();
-            }
-            Interaction::None => {
-                section.value = "Button".to_string();
-                *color = NORMAL_BUTTON.into();
-            }
-        }
-    }
-}
+const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.35, 0.35);
 
 fn setup_button(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
@@ -91,3 +66,22 @@ fn setup_button(mut commands: Commands, asset_server: Res<AssetServer>) {
                 });
         });
 }
+
+fn button_system(
+    mut button_interaction_query: ButtonInteractionQuery,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
+    for (interaction, mut color) in &mut button_interaction_query {
+        let new_color = match interaction {
+            Interaction::None => NORMAL_BUTTON,
+            Interaction::Hovered => HOVERED_BUTTON,
+            Interaction::Clicked => {
+                next_state.set(GameState::SecondMenu);
+                PRESSED_BUTTON
+            }
+        };
+        *color = new_color.into();
+    }
+}
+type ButtonInteractionQuery<'a, 'b, 'c> =
+    Query<'a, 'b, (&'c Interaction, &'c mut BackgroundColor), (Changed<Interaction>, With<Button>)>;
