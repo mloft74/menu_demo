@@ -33,6 +33,21 @@ fn setup_camera(mut commands: Commands) {
 }
 
 fn ui_example(mut contexts: EguiContexts) {
+    let window_frame = egui::Frame {
+        shadow: egui::epaint::Shadow::NONE,
+        fill: egui::Color32::from_gray(50),
+        inner_margin: egui::Margin::same(8.0),
+        ..default()
+    };
+    egui::Window::new("Unmovable hopefully")
+        .movable(false)
+        .resizable(false)
+        .frame(window_frame)
+        .current_pos((42.0, 87.5))
+        .collapsible(false)
+        .show(contexts.ctx_mut(), |ui| {
+            ui.label("heyo my dudes");
+        });
     let frame = egui::Frame {
         fill: egui::Color32::from_rgba_premultiplied(200, 200, 200, 200),
         outer_margin: egui::Margin::same(300.0),
