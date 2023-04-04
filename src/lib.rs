@@ -1,12 +1,15 @@
 use bevy::prelude::*;
+use bevy_egui::{egui, EguiContexts, EguiPlugin};
 
 pub struct MenuDemoGame;
 
 impl Plugin for MenuDemoGame {
     fn build(&self, app: &mut App) {
         app.add_plugins(DefaultPlugins)
+            .add_plugin(EguiPlugin)
             .add_state::<GameState>()
-            .add_system(setup_camera.on_startup());
+            .add_system(setup_camera.on_startup())
+            .add_system(ui_example);
     }
 }
 
@@ -27,4 +30,20 @@ fn setup_camera(mut commands: Commands) {
         },
         ..default()
     });
+}
+
+fn ui_example(mut contexts: EguiContexts) {
+    let frame = egui::Frame {
+        fill: egui::Color32::from_rgba_premultiplied(200, 200, 200, 200),
+        outer_margin: egui::Margin::same(300.0),
+        ..default()
+    };
+    egui::CentralPanel::default()
+        .frame(frame)
+        .show(contexts.ctx_mut(), |ui| {
+            ui.vertical_centered(|ui| {
+                ui.heading("Hello!");
+                ui.label("world");
+            });
+        });
 }
