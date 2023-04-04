@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 # Note: remove the "dynamic_linking" feature if publishing a release
 # Note: could also use `cargo run --features bevy/dynamic_linking`
-bevy = { version = "0.10.0", features = ["dynamic_linking"] }
+bevy = { version = "0.10.1", features = ["dynamic_linking"] }
 
 # Start optimizations (https://bevy-cheatbook.github.io/pitfalls/performance.html)
 

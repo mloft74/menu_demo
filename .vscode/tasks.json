@@ -1,0 +1,15 @@
+// for some reason, tasks.json needs to exist for debugging to work properly
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cargo",
+            "command": "build",
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "group": "build",
+            "label": "rust: cargo build"
+        }
+    ]
+}
