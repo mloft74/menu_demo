@@ -13,7 +13,7 @@ impl UiDefault for egui::Frame {
             fill: NewType(Color::SILVER.with_a(0.7)).into(),
             outer_margin: egui::Margin::symmetric(500.0, 200.0),
             rounding: egui::Rounding::same(12.0),
-            ..default()
+            ..Default::default()
         }
     }
 }

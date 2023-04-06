@@ -34,9 +34,9 @@ fn spawn_player(mut commands: Commands) {
             sprite: Sprite {
                 color: Color::PINK,
                 custom_size: Some(Vec2::splat(50.0)),
-                ..default()
+                ..Default::default()
             },
-            ..default()
+            ..Default::default()
         },
     ));
 }
