@@ -27,7 +27,7 @@ fn main_menu(mut contexts: EguiContexts, mut next_state: ResMut<NextState<GameSt
                 ui.separator();
                 ui.add_space(12.0);
                 if ui.button("To Second Menu").clicked() {
-                    next_state.set(GameState::SecondMenu);
+                    next_state.set(GameState::GamePlay);
                 }
             });
         });
