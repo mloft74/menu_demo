@@ -1,11 +1,12 @@
 mod game_play;
 mod main_menu;
+mod title;
 mod ui;
 
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiPlugin};
 
-use crate::{game_play::GamePlay, main_menu::MainMenu};
+use crate::{game_play::GamePlay, main_menu::MainMenu, title::Title};
 
 pub struct MenuDemoGame;
 
@@ -14,6 +15,7 @@ impl Plugin for MenuDemoGame {
         app.add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)
             .add_state::<GameState>()
+            .add_plugin(Title)
             .add_plugin(MainMenu)
             .add_plugin(GamePlay)
             .add_system(setup_camera.on_startup());
@@ -23,6 +25,7 @@ impl Plugin for MenuDemoGame {
 #[derive(States, Default, Debug, Hash, Eq, PartialEq, Clone, Copy)]
 enum GameState {
     #[default]
+    Title,
     MainMenu,
     GamePlay,
 }
