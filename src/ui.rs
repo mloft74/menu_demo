@@ -10,8 +10,8 @@ pub trait UiDefault {
 impl UiDefault for egui::Frame {
     fn ui_default() -> Self {
         Self {
-            fill: NewType(Color::CYAN).into(),
-            outer_margin: egui::Margin::symmetric(400.0, 100.0),
+            fill: NewType(Color::SILVER.with_a(0.7)).into(),
+            outer_margin: egui::Margin::symmetric(500.0, 200.0),
             rounding: egui::Rounding::same(12.0),
             ..default()
         }
