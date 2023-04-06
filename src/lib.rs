@@ -1,5 +1,6 @@
 mod game_play;
 mod main_menu;
+mod ui;
 
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiPlugin};
@@ -19,7 +20,7 @@ impl Plugin for MenuDemoGame {
     }
 }
 
-#[derive(States, Default, Debug, Hash, Eq, PartialEq, Clone)]
+#[derive(States, Default, Debug, Hash, Eq, PartialEq, Clone, Copy)]
 enum GameState {
     #[default]
     MainMenu,
