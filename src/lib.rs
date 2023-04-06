@@ -36,6 +36,7 @@ struct NewType<T>(T);
 
 impl From<NewType<Color>> for egui::Color32 {
     fn from(val: NewType<Color>) -> Self {
+        // NOTE: 0o10 is 1 byte
         let rgba = val.as_rgba_u32();
         let r = (rgba & 0x000000FF) as u8;
         let g = ((rgba & 0x0000FF00) >> 0o10) as u8;
