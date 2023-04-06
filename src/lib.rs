@@ -1,5 +1,9 @@
+mod main_menu;
+
 use bevy::prelude::*;
-use bevy_egui::{egui, EguiContexts, EguiPlugin};
+use bevy_egui::{egui, EguiPlugin};
+
+use crate::main_menu::MainMenu;
 
 pub struct MenuDemoGame;
 
@@ -8,13 +12,13 @@ impl Plugin for MenuDemoGame {
         app.add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)
             .add_state::<GameState>()
-            .add_system(setup_camera.on_startup())
-            .add_system(ui_example);
+            .add_plugin(MainMenu)
+            .add_system(setup_camera.on_startup());
     }
 }
 
 #[derive(States, Default, Debug, Hash, Eq, PartialEq, Clone, Copy)]
-pub enum GameState {
+enum GameState {
     #[default]
     MainMenu,
     SecondMenu,
@@ -22,43 +26,37 @@ pub enum GameState {
 
 fn setup_camera(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
-    commands.spawn(SpriteBundle {
-        sprite: Sprite {
-            color: Color::PINK,
-            custom_size: Some(Vec2::splat(50.0)),
-            ..default()
-        },
-        ..default()
-    });
 }
 
-fn ui_example(mut contexts: EguiContexts) {
-    let window_frame = egui::Frame {
-        shadow: egui::epaint::Shadow::NONE,
-        fill: egui::Color32::from_gray(50),
-        inner_margin: egui::Margin::same(8.0),
-        ..default()
-    };
-    egui::Window::new("Unmovable hopefully")
-        .movable(false)
-        .resizable(false)
-        .frame(window_frame)
-        .current_pos((42.0, 87.5))
-        .collapsible(false)
-        .show(contexts.ctx_mut(), |ui| {
-            ui.label("heyo my dudes");
-        });
-    let frame = egui::Frame {
-        fill: egui::Color32::from_rgba_premultiplied(200, 200, 200, 200),
-        outer_margin: egui::Margin::same(300.0),
-        ..default()
-    };
-    egui::CentralPanel::default()
-        .frame(frame)
-        .show(contexts.ctx_mut(), |ui| {
-            ui.vertical_centered(|ui| {
-                ui.heading("Hello!");
-                ui.label("world");
-            });
-        });
+#[derive(Deref)]
+struct NewType<T>(T);
+
+impl From<NewType<Color>> for egui::Color32 {
+    fn from(val: NewType<Color>) -> Self {
+        let rgba = val.as_rgba_u32();
+        let r = (rgba & 0x000000FF) as u8;
+        let g = ((rgba & 0x0000FF00) >> 0o10) as u8;
+        let b = ((rgba & 0x00FF0000) >> 0o20) as u8;
+        let a = ((rgba & 0xFF000000) >> 0o30) as u8;
+        Self::from_rgba_premultiplied(r, g, b, a)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn from_new_type_color() {
+        let bevy_color = Color::Rgba {
+            red: 1.0,
+            green: 0.5,
+            blue: 0.25,
+            alpha: 0.125,
+        };
+        let converted = egui::Color32::from(NewType(bevy_color));
+        let expected = egui::Color32::from_rgba_premultiplied(0xFF, 0x7f, 0x3f, 0x1f);
+
+        assert_eq!(expected, converted);
+    }
 }
