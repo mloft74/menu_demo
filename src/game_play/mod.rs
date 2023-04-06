@@ -12,6 +12,7 @@ impl Plugin for GamePlay {
         app.add_state::<PauseState>()
             .add_plugin(PauseMenu)
             .add_system(spawn_player.in_schedule(OnEnter(state)))
+            .add_system(despawn_player.in_schedule(OnExit(state)))
             .add_system(handle_escape.run_if(in_state(state)));
     }
 }
@@ -40,6 +41,12 @@ fn spawn_player(mut commands: Commands) {
     ));
 }
 
+fn despawn_player(mut commands: Commands, query: Query<Entity, With<Player>>) {
+    for entity in &query {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
 fn handle_escape(
     keys: Res<Input<KeyCode>>,
     state: Res<State<PauseState>>,
@@ -48,7 +55,6 @@ fn handle_escape(
     if !keys.just_pressed(KeyCode::Escape) {
         return;
     }
-    println!("running escape");
     next_state.set(match state.0 {
         PauseState::Playing => PauseState::Paused,
         PauseState::Paused => PauseState::Playing,
