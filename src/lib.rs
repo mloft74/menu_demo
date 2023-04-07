@@ -1,4 +1,5 @@
 mod game_play;
+mod input_plugin;
 mod main_menu;
 mod title;
 mod ui;
@@ -6,7 +7,7 @@ mod ui;
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiPlugin};
 
-use crate::{game_play::GamePlay, main_menu::MainMenu, title::Title};
+use crate::{game_play::GamePlay, input_plugin::InputPlugin, main_menu::MainMenu, title::Title};
 
 pub struct MenuDemoGame;
 
@@ -14,6 +15,7 @@ impl Plugin for MenuDemoGame {
     fn build(&self, app: &mut App) {
         app.add_plugins(DefaultPlugins)
             .add_plugin(EguiPlugin)
+            .add_plugin(InputPlugin)
             .add_state::<GameState>()
             .add_plugin(Title)
             .add_plugin(MainMenu)
