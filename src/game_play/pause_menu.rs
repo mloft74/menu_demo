@@ -3,8 +3,9 @@ use bevy_egui::{egui, EguiContexts};
 
 use crate::{input_plugin::Pause, ui::UiDefault, GameState};
 
-// TODO: I can see the relative speed changing to be pretty annoying to manage for pausing, so it may be better to manually choose to not run in certain states
+// NOTE: I can see the relative speed changing to be pretty annoying to manage for pausing, so it may be better to manually choose to not run in certain states
 // ^^^^: I have already entered a scenario where it's a little finnicky to use properly, since there are 2 ways of unpausing the game
+
 pub struct PauseMenu;
 
 impl Plugin for PauseMenu {
