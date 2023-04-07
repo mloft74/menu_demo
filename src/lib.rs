@@ -63,9 +63,9 @@ mod tests {
             blue: 0.25,
             alpha: 0.125,
         };
-        let converted = egui::Color32::from(NewType(color));
+        let actual = egui::Color32::from(NewType(color));
         let expected = egui::Color32::from_rgba_premultiplied(0xFF, 0x7f, 0x3f, 0x1f);
 
-        assert_eq!(expected, converted, "colors were different",);
+        assert_eq!(actual, expected, "colors were different",);
     }
 }

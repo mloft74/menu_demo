@@ -101,23 +101,31 @@ mod tests {
 
         app.update();
 
-        let pre_pause_state = app.world.resource::<State<PauseState>>().0.clone();
-        assert_eq!(
-            pre_pause_state,
-            PauseState::Playing,
-            "pre_pause_state was not playing",
-        );
+        let pre_state = app.world.resource::<State<PauseState>>().0.clone();
+        assert_eq!(pre_state, PauseState::Playing, "pre_state was not Playing");
+        let pre_next_state = app.world.resource::<NextState<PauseState>>().0.clone();
+        assert_eq!(pre_next_state, None, "pre_next_state was wrong value");
 
         app.world.resource_mut::<Pause>().0 = true;
-        // Two updates are needed in bevy 0.10.1; the first sets NextState, the second applies the transition
         app.update();
+
+        let next_state = app.world.resource::<NextState<PauseState>>().0.clone();
+        assert_eq!(
+            next_state,
+            Some(PauseState::Paused),
+            "next_state was wrong value",
+        );
+
+        app.world.resource_mut::<Pause>().0 = false;
         app.update();
 
         let post_pause_state = app.world.resource::<State<PauseState>>().0.clone();
         assert_eq!(
             post_pause_state,
             PauseState::Paused,
-            "post_pause_state was not paused",
+            "post_pause_state was wrong value",
         );
+        let post_next_state = app.world.resource::<NextState<PauseState>>().0.clone();
+        assert_eq!(post_next_state, None, "post_next_state was wrong value");
     }
 }
