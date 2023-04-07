@@ -44,14 +44,16 @@ fn pause_menu(
         .frame(egui::Frame::ui_default())
         .show(contexts.ctx_mut(), |ui| {
             ui.vertical_centered(|ui| {
-                let padding = 12.0;
-                ui.add_space(padding);
+                let padding_l = 12.0;
+                let padding_s = 8.0;
+                ui.add_space(padding_l);
                 ui.heading("Paused");
                 ui.separator();
-                ui.add_space(padding);
+                ui.add_space(padding_l);
                 if ui.button("Continue").clicked() {
                     continue_playing(&mut time, &mut next_pause_state);
                 }
+                ui.add_space(padding_s);
                 if ui.button("Main Menu").clicked() {
                     next_game_state.set(GameState::MainMenu);
                 }
