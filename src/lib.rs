@@ -19,7 +19,7 @@ impl Plugin for MenuDemoGame {
             .add_state::<GameState>()
             .add_plugin(Title)
             .add_plugin(MainMenu)
-            .add_plugin(GamePlay)
+            .add_plugins(GamePlay)
             .add_system(setup_camera.on_startup());
     }
 }
