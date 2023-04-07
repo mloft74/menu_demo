@@ -11,7 +11,11 @@ impl Plugin for PauseMenu {
     fn build(&self, app: &mut App) {
         app.add_state::<PauseState>()
             .add_system(pause_menu.run_if(in_state(PauseState::Paused)))
-            .add_system(handle_pause.run_if(in_state(GameState::GamePlay)))
+            .add_system(
+                handle_pause
+                    .run_if(in_state(GameState::GamePlay))
+                    .run_if(|pause: Res<Pause>| **pause),
+            )
             .add_system(clean_up.in_schedule(OnExit(GameState::GamePlay)));
     }
 }
@@ -49,14 +53,10 @@ fn pause_menu(
 }
 
 fn handle_pause(
-    pause: Res<Pause>,
     state: Res<State<PauseState>>,
     mut time: ResMut<Time>,
     mut next_state: ResMut<NextState<PauseState>>,
 ) {
-    if !**pause {
-        return;
-    }
     match state.0 {
         PauseState::Playing => {
             time.set_relative_speed(0.0);
