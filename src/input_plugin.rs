@@ -25,7 +25,7 @@ pub struct MovementModifier {
 
 #[derive(Resource, Default)]
 pub struct MovementDirection {
-    /// Not a normalized vector, but both axes are [-1.0, 1.0].
+    /// Not a normalized vector, but both axes are \[-1.0, 1.0\].
     pub direction: Vec2,
 }
 
