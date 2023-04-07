@@ -31,7 +31,7 @@ pub struct MovementDirection {
 
 /// Will be true if a pause key was just pressed.
 #[derive(Resource, Default, Deref)]
-pub struct Pause(bool);
+pub struct Pause(pub bool);
 
 // TODO: make keys remappable
 fn determine_movement_direction(

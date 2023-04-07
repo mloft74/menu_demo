@@ -6,18 +6,24 @@ use crate::{input_plugin::Pause, ui::UiDefault, GameState};
 // NOTE: I can see the relative speed changing to be pretty annoying to manage for pausing, so it may be better to manually choose to not run in certain states
 // ^^^^: I have already entered a scenario where it's a little finnicky to use properly, since there are 2 ways of unpausing the game
 
-pub struct PauseMenu;
+#[derive(Default)]
+pub struct PauseMenu {
+    disable_ui: bool,
+}
 
 impl Plugin for PauseMenu {
     fn build(&self, app: &mut App) {
         app.add_state::<PauseState>()
-            .add_system(pause_menu.run_if(in_state(PauseState::Paused)))
             .add_system(
                 handle_pause
                     .run_if(in_state(GameState::GamePlay))
                     .run_if(|pause: Res<Pause>| **pause),
             )
             .add_system(clean_up.in_schedule(OnExit(GameState::GamePlay)));
+        if self.disable_ui {
+            return;
+        }
+        app.add_system(pause_menu.run_if(in_state(PauseState::Paused)));
     }
 }
 
@@ -75,4 +81,43 @@ fn continue_playing(time: &mut ResMut<Time>, next_state: &mut ResMut<NextState<P
 fn clean_up(mut time: ResMut<Time>, mut next_state: ResMut<NextState<PauseState>>) {
     time.set_relative_speed(1.0);
     next_state.set(PauseState::Playing);
+}
+
+#[cfg(test)]
+mod tests {
+    use bevy::time::TimePlugin;
+
+    use super::*;
+
+    #[test]
+    fn handle_pause_runs_only_when_res_is_true() {
+        let mut app = App::new();
+        app.add_plugin(TimePlugin)
+            .insert_resource(Pause(false))
+            .add_state::<GameState>()
+            .add_state::<PauseState>();
+        app.world.resource_mut::<State<GameState>>().0 = GameState::GamePlay;
+        app.add_plugin(PauseMenu { disable_ui: true });
+
+        app.update();
+
+        let pre_pause_state = app.world.resource::<State<PauseState>>().0.clone();
+        assert_eq!(
+            pre_pause_state,
+            PauseState::Playing,
+            "pre_pause_state was not playing",
+        );
+
+        app.world.resource_mut::<Pause>().0 = true;
+        // Two updates are needed in bevy 0.10.1; the first sets NextState, the second applies the transition
+        app.update();
+        app.update();
+
+        let post_pause_state = app.world.resource::<State<PauseState>>().0.clone();
+        assert_eq!(
+            post_pause_state,
+            PauseState::Paused,
+            "post_pause_state was not paused",
+        );
+    }
 }

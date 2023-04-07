@@ -57,15 +57,15 @@ mod tests {
 
     #[test]
     fn from_new_type_color() {
-        let bevy_color = Color::Rgba {
+        let color = Color::Rgba {
             red: 1.0,
             green: 0.5,
             blue: 0.25,
             alpha: 0.125,
         };
-        let converted = egui::Color32::from(NewType(bevy_color));
+        let converted = egui::Color32::from(NewType(color));
         let expected = egui::Color32::from_rgba_premultiplied(0xFF, 0x7f, 0x3f, 0x1f);
 
-        assert_eq!(expected, converted);
+        assert_eq!(expected, converted, "colors were different",);
     }
 }
