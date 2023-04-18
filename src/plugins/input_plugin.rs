@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+// TODO: make keys remappable
+
 pub struct InputPlugin;
 
 impl Plugin for InputPlugin {
@@ -33,7 +35,6 @@ pub struct MovementDirection {
 #[derive(Resource, Default, Deref)]
 pub struct Pause(pub bool);
 
-// TODO: make keys remappable
 fn determine_movement_direction(
     keyboard_input: Res<Input<KeyCode>>,
     mut movement_direction: ResMut<MovementDirection>,

@@ -6,13 +6,11 @@ use bevy_egui::EguiContexts;
 
 use crate::{ui::UiDefault, GameState};
 
-#[derive(SystemSet, Hash, Debug, Eq, PartialEq, Clone)]
 pub struct Title;
 
 impl Plugin for Title {
     fn build(&self, app: &mut App) {
-        app.add_systems((title, press_any_key).in_set(Title))
-            .configure_set(Title.run_if(in_state(GameState::Title)));
+        app.add_systems((title, press_any_key).distributive_run_if(in_state(GameState::Title)));
     }
 }
 

@@ -1,10 +1,7 @@
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};
 
-use crate::{input_plugin::Pause, ui::UiDefault, GameState};
-
-// NOTE: I can see the relative speed changing to be pretty annoying to manage for pausing, so it may be better to manually choose to not run in certain states
-// ^^^^: I have already entered a scenario where it's a little finnicky to use properly, since there are 2 ways of unpausing the game
+use crate::{plugins::input_plugin::Pause, ui::UiDefault, GameState};
 
 #[derive(Default)]
 pub struct PauseMenu {
@@ -28,7 +25,7 @@ impl Plugin for PauseMenu {
 }
 
 #[derive(States, Default, Debug, Hash, Eq, PartialEq, Clone)]
-enum PauseState {
+pub enum PauseState {
     #[default]
     Playing,
     Paused,
@@ -36,7 +33,6 @@ enum PauseState {
 
 fn pause_menu(
     mut contexts: EguiContexts,
-    mut time: ResMut<Time>,
     mut next_pause_state: ResMut<NextState<PauseState>>,
     mut next_game_state: ResMut<NextState<GameState>>,
 ) {
@@ -51,7 +47,7 @@ fn pause_menu(
                 ui.separator();
                 ui.add_space(padding_l);
                 if ui.button("Continue").clicked() {
-                    continue_playing(&mut time, &mut next_pause_state);
+                    next_pause_state.set(PauseState::Playing);
                 }
                 ui.add_space(padding_s);
                 if ui.button("Main Menu").clicked() {
@@ -61,41 +57,25 @@ fn pause_menu(
         });
 }
 
-fn handle_pause(
-    state: Res<State<PauseState>>,
-    mut time: ResMut<Time>,
-    mut next_state: ResMut<NextState<PauseState>>,
-) {
-    match state.0 {
-        PauseState::Playing => {
-            time.set_relative_speed(0.0);
-            next_state.set(PauseState::Paused);
-        }
-        PauseState::Paused => continue_playing(&mut time, &mut next_state),
-    };
+fn handle_pause(state: Res<State<PauseState>>, mut next_state: ResMut<NextState<PauseState>>) {
+    next_state.set(match state.0 {
+        PauseState::Playing => PauseState::Paused,
+        PauseState::Paused => PauseState::Playing,
+    });
 }
 
-fn continue_playing(time: &mut ResMut<Time>, next_state: &mut ResMut<NextState<PauseState>>) {
-    time.set_relative_speed(1.0);
-    next_state.set(PauseState::Playing);
-}
-
-fn clean_up(mut time: ResMut<Time>, mut next_state: ResMut<NextState<PauseState>>) {
-    time.set_relative_speed(1.0);
+fn clean_up(mut next_state: ResMut<NextState<PauseState>>) {
     next_state.set(PauseState::Playing);
 }
 
 #[cfg(test)]
 mod tests {
-    use bevy::time::TimePlugin;
-
     use super::*;
 
     #[test]
     fn handle_pause_runs_only_when_res_is_true() {
         let mut app = App::new();
-        app.add_plugin(TimePlugin)
-            .insert_resource(Pause(false))
+        app.insert_resource(Pause(false))
             .add_state::<GameState>()
             .add_state::<PauseState>();
         app.world.resource_mut::<State<GameState>>().0 = GameState::GamePlay;
